@@ -5,6 +5,7 @@ import Home from './Home';
 import Footer from './Footer';
 import Game from './Game';
 import GameHeader from './GameHeader';
+import Modal from './Modal';
 import axios from 'axios';
 
 class App extends Component {
@@ -16,7 +17,8 @@ class App extends Component {
       difficulty: "",
       questions: [],
       score: 0,
-      time: 0
+      time: 0,
+      fail: false
     }
     this.categories = {
       generalKnowledge: 9,
@@ -45,7 +47,11 @@ class App extends Component {
       cartoons: 32
     }
   }
-
+  toggleModal = () => {
+    this.setState({
+      fail: !this.state.fail
+    });
+  }
   submitGame = (e) => {
     e.preventDefault();
     const category = e.target.category.value;
@@ -57,20 +63,26 @@ class App extends Component {
       diff = "";
     }
     axios.get("https://opentdb.com/api.php?amount=" + this.state.questionNum + cat + diff + type).then(res=>{
-      this.setState({
-        category: category,
-        difficulty: difficulty,
-        questions: res.data.results
-      });
+      if(res.data.results.length < this.state.questionNum){
+        this.toggleModal();
+      }
+      else{
+        this.setState({
+          category: category,
+          difficulty: difficulty,
+          questions: res.data.results
+        });
+        this.props.history.push("/game");
+      }
     }).catch(err=>{
       console.log(err);
     })
-    this.props.history.push("/game");
   }
 
   render() {
     return (
       <div className="App">
+        <Modal show={this.state.fail} toggle={this.toggleModal} />
         <Switch>
           <Route path="/" exact render={() => {return <Home formSubmit={this.submitGame}/>}} />
           <Route path="/game" render={() => {

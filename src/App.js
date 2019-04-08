@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Route, Switch, withRouter} from 'react-router-dom';
+import {Route, Switch, withRouter, Redirect} from 'react-router-dom';
 import './index.scss';
 import Home from './Home';
 import Footer from './Footer';
@@ -79,6 +79,7 @@ class App extends Component {
                 <Game len={this.state.questionNum} questions={this.state.questions}/>
               </>
             }} />
+          <Route path="/" render={()=>{return <Redirect to="/" />}} />
         </Switch>
         <Footer />
       </div>
